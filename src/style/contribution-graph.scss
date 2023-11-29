@@ -2,8 +2,15 @@
 
 .contribution {
   display: flex;
-  justify-content: center;
+  width: 100%;
+
+  @media (min-width: 1024px) {
+    justify-content: center;
+  }
+
+  overflow: auto;
   padding-top: 100px;
+  padding-bottom: 20px;
 
   &--graph {
     display: flex;
