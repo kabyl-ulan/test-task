@@ -6,8 +6,6 @@ function ContributionGraph() {
 
   const currentDate = new Date();
 
-  // console.log(contributions);
-
   const getContribution = async () => {
     try {
       const { data } = await PUBLIC_API.get("test/calendar.json");
@@ -19,75 +17,59 @@ function ContributionGraph() {
 
   const renderGrid = () => {
     const grid = [];
+    const currentDayofWeek = currentDate.getDay();
 
-    for (let i = 0; i < 7; i++) {
+    const rows = 7;
+    const column = 51;
+
+    for (let i = 0; i < rows; i++) {
       const row = [];
 
-      for (let j = 0; j < 51; j++) {
+      for (let j = 0; j < column; j++) {
         const date = new Date(
           currentDate.getFullYear(),
           currentDate.getMonth(),
-          currentDate.getDate() - i * 7 - j
+          currentDate.getDate() + (rows - currentDayofWeek) - (j * rows + i)
         );
+
         const contributionCount =
           contributions[date.toISOString().split("T")[0]] || 0;
         let colorClass = getColorClass(contributionCount);
+
         row.push(
           <div
             key={`${i}-${j}`}
             className={`contribution-block ${colorClass}`}
-          />
+            onClick={() => {
+              const originalDate = new Date(date);
+
+              const options = {
+                weekday: "long", // Полное название дня недели
+                month: "long", // Полное название месяца
+                day: "numeric", // День месяца
+                year: "numeric", // Полный год
+              };
+
+              const formattedDate = originalDate.toLocaleDateString(
+                "ru-RU",
+                options
+              );
+
+              alert(`${contributionCount} contrubuints,  ${formattedDate}`);
+            }}
+          ></div>
         );
       }
 
       grid.push(
         <div key={i} className="contribution-row">
-          {row}
+          {row.reverse()}
         </div>
       );
     }
 
-    return grid;
+    return grid.reverse();
   };
-
-  // const renderGrid = () => {
-  //   const grid = [];
-  //   const currentDate = new Date(); // текущая дата
-
-  //   for (let i = 0; i < 7; i++) {
-  //     const row = [];
-
-  //     for (let j = 0; j < 51; j++) {
-  //       const date = new Date(
-  //         currentDate.getFullYear(),
-  //         currentDate.getMonth(),
-  //         currentDate.getDate() - (i * 7 + j)
-  //       );
-
-  //       const contributionCount =
-  //         contributions[date.toISOString().split("T")[0]] || 0;
-  //       let colorClass = getColorClass(contributionCount);
-
-  //       row.push(
-  //         <div
-  //           key={`${i}-${j}`}
-  //           className={`contribution-block ${colorClass}`}
-  //           onClick={() => {
-  //             alert(date);
-  //           }}
-  //         />
-  //       );
-  //     }
-
-  //     grid.push(
-  //       <div key={i} className="contribution-row">
-  //         {row}
-  //       </div>
-  //     );
-  //   }
-
-  //   return grid;
-  // };
 
   const renderMonthLabels = () => {
     const monthLabels = [];
@@ -147,15 +129,24 @@ function ContributionGraph() {
   };
 
   const lightIndicator = () => {
+    const contributionRanges = [
+      { className: "no-contribution", range: "No contributions" },
+      { className: "low-contribution", range: "1-9 contributions" },
+      { className: "medium-contribution", range: "10-19 contributions" },
+      { className: "high-contribution", range: "20-29 contributions" },
+      { className: "max-contribution", range: "30+ contributions" },
+    ];
     return (
       <div className="light-indicator">
         <p className="light-indicator__text">Меньше</p>
         <div className="light-indicator__colors">
-          <div className="contribution-block no-contribution"></div>
-          <div className="contribution-block low-contribution"></div>
-          <div className="contribution-block medium-contribution"></div>
-          <div className="contribution-block high-contribution"></div>
-          <div className="contribution-block max-contribution"></div>
+          {contributionRanges.map((elem, index) => (
+            <div
+              key={index}
+              className={`contribution-block ${elem.className}`}
+              onClick={() => alert(elem.range)}
+            ></div>
+          ))}
         </div>
         <p className="light-indicator__text">Больше</p>
       </div>

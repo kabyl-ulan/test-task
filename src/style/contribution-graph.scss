@@ -3,7 +3,6 @@
 .contribution {
   display: flex;
   justify-content: center;
-  overflow: auto;
   padding-top: 100px;
 
   &--graph {
@@ -17,11 +16,22 @@
 }
 
 .contribution-block {
+  position: relative;
   @include squareHeight();
 
   &:hover {
     border: 1px solid rgba(0, 0, 0, 0.5);
     margin: 0;
+  }
+
+  &:active {
+    border: 1px solid rgba(0, 0, 0, 0.9);
+  }
+
+  &__item {
+    position: absolute;
+    top: 0;
+    left: 0;
   }
 }
 
