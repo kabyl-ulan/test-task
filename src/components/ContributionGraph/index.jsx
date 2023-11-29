@@ -32,8 +32,16 @@ function ContributionGraph() {
           currentDate.getDate() + (rows - currentDayofWeek) - (j * rows + i)
         );
 
-        const contributionCount =
-          contributions[date.toISOString().split("T")[0]] || 0;
+        const originalDate = new Date(date);
+
+        const year = originalDate.getFullYear();
+        const month = (originalDate.getMonth() + 1).toString().padStart(2, "0"); // +1, так как месяцы в JavaScript начинаются с 0
+        const day = originalDate.getDate().toString().padStart(2, "0");
+
+        const formattedDate = `${year}-${month}-${day}`;
+
+        const contributionCount = contributions[formattedDate] || 0;
+
         let colorClass = getColorClass(contributionCount);
 
         row.push(
