@@ -27,11 +27,47 @@
   &:active {
     border: 1px solid rgba(0, 0, 0, 0.9);
   }
-
-  &__item {
+  .popup {
     position: absolute;
-    top: 0;
-    left: 0;
+    padding-bottom: 5px;
+    z-index: 2;
+    bottom: 15px;
+    left: 50%;
+    transform: translate(-50%);
+    &-text {
+      border-radius: 3px;
+      background: rgba(0, 0, 0, 1);
+      color: rgba(124, 124, 124, 1);
+      white-space: nowrap;
+      padding: 5px;
+
+      &::after {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 0;
+        border: 10px solid transparent;
+        border-top-color: rgba(0, 0, 0, 1);
+        z-index: 1;
+        bottom: -10px;
+        left: 50%;
+        transform: translate(-50%);
+      }
+
+      &__contributions {
+        color: rgba(255, 255, 255, 1);
+        text-align: center;
+        @include textStyles();
+        font-size: 12px;
+      }
+
+      &__date {
+        @include textStyles();
+        @include colorText();
+        text-align: center;
+        font-size: 10px;
+      }
+    }
   }
 }
 
@@ -68,6 +104,8 @@
   &--label {
     padding: 2px;
     @include textStyles();
+    @include colorText();
+    font-size: 12px;
   }
   &--label-empty {
     width: 10px;
@@ -81,7 +119,9 @@
 .day-label {
   @include squareHeight();
   @include textStyles();
+  @include colorText();
   margin-right: 5px;
+  font-size: 12px;
 
   &:first-child {
     @include heigthRow();
@@ -95,6 +135,8 @@
   padding-top: 20px;
   &__text {
     @include textStyles();
+    @include colorText();
+    font-size: 12px;
   }
   &__colors {
     display: flex;

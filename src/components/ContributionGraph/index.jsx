@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { PUBLIC_API } from "../../api";
+import { formatDateToISO, formatDateToString, getColorClass } from "./config";
 
 function ContributionGraph() {
   const [contributions, setContributions] = useState({});
-
   const currentDate = new Date();
+  const rows = 7;
+  const column = 51;
 
   const getContribution = async () => {
     try {
@@ -19,61 +21,29 @@ function ContributionGraph() {
     const grid = [];
     const currentDayofWeek = currentDate.getDay();
 
-    const rows = 7;
-    const column = 51;
-
     for (let i = 0; i < rows; i++) {
       const row = [];
-
       for (let j = 0; j < column; j++) {
         const date = new Date(
           currentDate.getFullYear(),
           currentDate.getMonth(),
           currentDate.getDate() + (rows - currentDayofWeek) - (j * rows + i)
         );
-
-        const originalDate = new Date(date);
-
-        const year = originalDate.getFullYear();
-        const month = (originalDate.getMonth() + 1).toString().padStart(2, "0"); // +1, так как месяцы в JavaScript начинаются с 0
-        const day = originalDate.getDate().toString().padStart(2, "0");
-
-        const formattedDate = `${year}-${month}-${day}`;
-
-        const contributionCount = contributions[formattedDate] || 0;
-
+        const contributionCount = contributions[formatDateToISO(date)] || 0;
         let colorClass = getColorClass(contributionCount);
-
-        row.push(
-          <div
-            key={`${i}-${j}`}
-            className={`contribution-block ${colorClass}`}
-            onClick={() => {
-              const originalDate = new Date(date);
-
-              const options = {
-                weekday: "long", // Полное название дня недели
-                month: "long", // Полное название месяца
-                day: "numeric", // День месяца
-                year: "numeric", // Полный год
-              };
-
-              const formattedDate = originalDate.toLocaleDateString(
-                "ru-RU",
-                options
-              );
-
-              alert(`${contributionCount} contrubuints,  ${formattedDate}`);
-            }}
-          ></div>
-        );
+        row.push({
+          key: `${i}-${j}`,
+          className: `contribution-block ${colorClass}`,
+          contributionCount,
+          date,
+        });
       }
 
-      grid.push(
-        <div key={i} className="contribution-row">
-          {row.reverse()}
-        </div>
-      );
+      grid.push({
+        key: i,
+        className: "contribution-row",
+        children: row.reverse(),
+      });
     }
 
     return grid.reverse();
@@ -84,11 +54,11 @@ function ContributionGraph() {
     const currentMonth = new Date().getMonth();
     const displayedMonths = new Set();
 
-    for (let i = 0; i < 51; i++) {
+    for (let i = 0; i < column; i++) {
       const date = new Date(
         currentDate.getFullYear(),
         currentMonth,
-        currentDate.getDate() - i * 7
+        currentDate.getDate() - i * rows
       );
       const monthLabel = date.toLocaleDateString("ru-RU", { month: "short" });
 
@@ -109,20 +79,6 @@ function ContributionGraph() {
     return monthLabels.reverse();
   };
 
-  const getColorClass = (contributionCount) => {
-    if (contributionCount === 0) {
-      return "no-contribution";
-    } else if (contributionCount >= 1 && contributionCount <= 9) {
-      return "low-contribution";
-    } else if (contributionCount >= 10 && contributionCount <= 19) {
-      return "medium-contribution";
-    } else if (contributionCount >= 20 && contributionCount <= 29) {
-      return "high-contribution";
-    } else {
-      return "max-contribution";
-    }
-  };
-
   const dayLabel = () => {
     return (
       <div>
@@ -138,25 +94,61 @@ function ContributionGraph() {
 
   const lightIndicator = () => {
     const contributionRanges = [
-      { className: "no-contribution", range: "No contributions" },
-      { className: "low-contribution", range: "1-9 contributions" },
-      { className: "medium-contribution", range: "10-19 contributions" },
-      { className: "high-contribution", range: "20-29 contributions" },
-      { className: "max-contribution", range: "30+ contributions" },
+      {
+        className: "contribution-block no-contribution",
+        contributionCount: "No",
+      },
+      {
+        className: "contribution-block low-contribution",
+        contributionCount: "1-9",
+      },
+      {
+        className: "contribution-block medium-contribution",
+        contributionCount: "10-19",
+      },
+      {
+        className: "contribution-block high-contribution",
+        contributionCount: "20-29",
+      },
+      {
+        className: "contribution-block max-contribution",
+        contributionCount: "30+",
+      },
     ];
     return (
       <div className="light-indicator">
         <p className="light-indicator__text">Меньше</p>
         <div className="light-indicator__colors">
           {contributionRanges.map((elem, index) => (
-            <div
-              key={index}
-              className={`contribution-block ${elem.className}`}
-              onClick={() => alert(elem.range)}
-            ></div>
+            <Square key={index} elem={elem} />
           ))}
         </div>
         <p className="light-indicator__text">Больше</p>
+      </div>
+    );
+  };
+
+  const Square = ({ elem }) => {
+    const { contributionCount, date, className } = elem;
+    const [isVisible, setVisible] = useState(false);
+    return (
+      <div
+        className={className}
+        onMouseLeave={() => setVisible(false)}
+        onClick={() => setVisible(true)}
+      >
+        {isVisible && (
+          <div className="popup">
+            <div className="popup-text">
+              <p className="popup-text__contributions">{`${
+                contributionCount === 0 ? "No" : contributionCount
+              } contributions`}</p>
+              <p className="popup-text__date">
+                {date && formatDateToString(date)}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     );
   };
@@ -170,7 +162,14 @@ function ContributionGraph() {
         {dayLabel()}
         <div className="contribution--graph">
           <div className="month">{renderMonthLabels()}</div>
-          {!!contributions && renderGrid()}
+          {!!contributions &&
+            renderGrid().map((row) => (
+              <div key={row.key} className={row.className}>
+                {row.children.map((elem) => (
+                  <Square key={elem.key} elem={elem} />
+                ))}
+              </div>
+            ))}
           <>{lightIndicator()}</>
         </div>
       </div>
