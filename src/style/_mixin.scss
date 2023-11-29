@@ -1,0 +1,22 @@
+@mixin textStyles {
+  font-family: Inter, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 15px;
+  letter-spacing: 0em;
+  color: rgba(149, 148, 148, 1);
+  text-transform: lowercase;
+  &::first-letter {
+    text-transform: uppercase;
+  }
+}
+
+@mixin heigthRow {
+  height: 20px;
+}
+
+@mixin squareHeight {
+  width: 15px;
+  height: 15px;
+  margin: 1px;
+}

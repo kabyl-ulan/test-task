@@ -1,0 +1,93 @@
+@import "mixin";
+
+.contribution {
+  display: flex;
+  justify-content: center;
+  overflow: auto;
+  padding-top: 100px;
+
+  &--graph {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.contribution-row {
+  display: flex;
+}
+
+.contribution-block {
+  @include squareHeight();
+
+  &:hover {
+    border: 1px solid rgba(0, 0, 0, 0.5);
+    margin: 0;
+  }
+}
+
+.no-contribution {
+  background-color: rgba(
+    237,
+    237,
+    237,
+    1
+  ); /* свет для отсутствия контрибуций */
+}
+
+.low-contribution {
+  background-color: rgba(172, 213, 242, 1); /* свет для 1-9 контрибуций */
+}
+
+.medium-contribution {
+  background-color: rgba(127, 168, 201, 1); /* свет для 10-19 контрибуций */
+}
+
+.high-contribution {
+  background-color: rgba(82, 123, 160, 1); /* свет для 20-29 контрибуций */
+}
+
+.max-contribution {
+  background-color: rgba(37, 78, 119, 1); /* свет для 30+ контрибуций */
+}
+
+/********************************************/
+
+.month {
+  display: flex;
+  @include heigthRow();
+  &--label {
+    padding: 2px;
+    @include textStyles();
+  }
+  &--label-empty {
+    width: 10px;
+    height: 10px;
+    margin: 1px;
+  }
+}
+
+/********************************************/
+
+.day-label {
+  @include squareHeight();
+  @include textStyles();
+  margin-right: 5px;
+
+  &:first-child {
+    @include heigthRow();
+  }
+}
+
+/*******************************************/
+
+.light-indicator {
+  display: flex;
+  padding-top: 20px;
+  &__text {
+    @include textStyles();
+  }
+  &__colors {
+    display: flex;
+    padding: 0 5px;
+  }
+}

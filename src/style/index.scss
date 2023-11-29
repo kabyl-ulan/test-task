@@ -1,9 +1,2 @@
-* {
-  margin: 0;
-  padding: 0;
-}
-
-a,
-a:hover {
-  text-decoration: none;
-}
+@import "reset";
+@import "contribution-graph";
